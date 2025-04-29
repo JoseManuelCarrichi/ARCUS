@@ -10,10 +10,10 @@ mcp = FastMCP("Weather")
 @mcp.tool()
 async def get_weather(city: str) -> dict:
     """
-    Get the current weather for a given city.
+    Get the current weather for a given city. Returns a summary of the weather for the requested city.
     
     Args:
-        city (str): The name of the city to get the weather for.
+        city (str): The english name of the city to get the weather for. 
     """
 
     # Use the Open-Meteo API to get the geocode for the city
@@ -33,8 +33,7 @@ async def get_weather(city: str) -> dict:
                 return {"error": "No results found for the given city."}
             
             # Use the Open-Meteo API to get the weather for the geocode
-            weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain" 
-
+            weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,is_day,relative_humidity_2m,precipitation,rain&forecast_days=3"
             weather_response = await client.get(weather_url, timeout=30.0)
             weather_response.raise_for_status()
             weather_data = weather_response.json()
@@ -43,11 +42,3 @@ async def get_weather(city: str) -> dict:
 
         except httpx.RequestError as e:
             return {"error": f"An error occurred while requesting the weather: {e}"}
-
-
-
-if __name__ == "__main__":
-    # Start the server
-    mcp.run(transport='stdio')
-
-
